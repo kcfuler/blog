@@ -1,12 +1,10 @@
-import './App.css';
+import { Flex, Text, Button } from "@radix-ui/themes";
 
-const App = () => {
+export default function MyApp() {
   return (
-    <div className="content">
-      <h1>Rsbuild with React</h1>
-      <p>Start building amazing things with Rsbuild.</p>
-    </div>
+    <Flex direction="row" gap="2">
+      <Text>Hello from Radix Themes :)</Text>
+      <Button>Let's go</Button>
+    </Flex>
   );
-};
-
-export default App;
+}
