@@ -1,0 +1,150 @@
+---
+// Component Script (在这里运行 JavaScript/TypeScript)
+import { ViewTransitions } from "astro:transitions";
+import "../styles/globals.css";
+
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!-- Component Template (在这里写 HTML/JSX) -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Blog" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ViewTransitions />
+    <script is:inline>
+      // 检查系统主题偏好和本地存储的主题设置
+      const theme = (() => {
+        if (
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem("theme")
+        ) {
+          return localStorage.getItem("theme");
+        }
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          return "dark";
+        }
+        return "light";
+      })();
+
+      // 应用主题
+      if (theme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+      localStorage.setItem("theme", theme);
+
+      // 监听系统主题变化
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => {
+          if (!localStorage.getItem("theme")) {
+            document.documentElement.classList.toggle("dark", e.matches);
+            localStorage.setItem("theme", e.matches ? "dark" : "light");
+          }
+        });
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-background font-sans antialiased">
+      <div class="relative flex min-h-screen flex-col">
+        <header
+          class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        >
+          <div class="container flex h-14 items-center">
+            <div class="mr-4 flex">
+              <a class="mr-6 flex items-center space-x-2" href="/">
+                <span class="font-bold">Blog</span>
+              </a>
+            </div>
+            <nav class="flex items-center space-x-6 text-sm font-medium">
+              <a href="/" class="transition-colors hover:text-foreground/80"
+                >Home</a
+              >
+              <a
+                href="/create-post"
+                class="transition-colors hover:text-foreground/80"
+                >Create Post</a
+              >
+            </nav>
+            <div class="flex flex-1 items-center justify-end space-x-4">
+              <nav class="flex items-center space-x-2">
+                <button
+                  id="theme-toggle"
+                  class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+                  >
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="m4.93 4.93 1.41 1.41"></path>
+                    <path d="m17.66 17.66 1.41 1.41"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="m6.34 17.66-1.41 1.41"></path>
+                    <path d="m19.07 4.93-1.41 1.41"></path>
+                  </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+                  >
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </header>
+        <main class="flex-1">
+          <slot />
+        </main>
+      </div>
+    </div>
+
+    <script>
+      // 主题切换按钮
+      document.getElementById("theme-toggle")?.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.contains("dark");
+        document.documentElement.classList.toggle("dark", !isDark);
+        localStorage.setItem("theme", isDark ? "light" : "dark");
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -1,25 +1,30 @@
-import client from './client';
+import { API_ROUTES } from "../config/api";
 
-export interface LoginData {
+interface LoginCredentials {
   email: string;
   password: string;
 }
 
-export interface RegisterData extends LoginData {
-  username: string;
+interface LoginResponse {
+  token: string;
+  message?: string;
 }
 
-export const login = async (data: LoginData) => {
-  const response = await client.post('/users/token', data);
-  return response.data;
-};
+export async function login(
+  credentials: LoginCredentials
+): Promise<LoginResponse> {
+  const response = await fetch(API_ROUTES.LOGIN, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
 
-export const register = async (data: RegisterData) => {
-  const response = await client.post('/users/register', data);
-  return response.data;
-};
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Login failed");
+  }
 
-export const getCurrentUser = async () => {
-  const response = await client.get('/users/me');
-  return response.data;
-};
+  return response.json();
+}

@@ -15,7 +15,11 @@ import (
 
 func main() {
 	// 设置JWT密钥
-	os.Setenv("JWT_SECRET_KEY", "your-secret-key")
+	jwtKey := os.Getenv("JWT_SECRET_KEY")
+	if jwtKey == "" {
+		jwtKey = "your-secret-key" // 默认密钥，仅用于开发环境
+	}
+	middleware.SetJWTKey([]byte(jwtKey))
 
 	// 连接数据库
 	db, err := gorm.Open("sqlite3", "blog.db")
@@ -34,30 +38,37 @@ func main() {
 	// 创建路由
 	r := gin.Default()
 
+	// 设置受信任的代理
+	r.SetTrustedProxies([]string{"127.0.0.1", "::1"})
+
 	// CORS配置
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173"}
+	config.AllowOrigins = []string{"http://localhost:3000", "http://localhost:5173"}
 	config.AllowCredentials = true
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 	r.Use(cors.New(config))
 
-	// 公开路由
-	r.POST("/api/register", userHandler.Register)
-	r.POST("/api/login", userHandler.Login)
-
-	// 需要认证的路由
-	auth := r.Group("/api")
-	auth.Use(middleware.AuthMiddleware())
+	// API 路由组
+	api := r.Group("/api")
 	{
-		// 用户相关
-		auth.GET("/profile", userHandler.GetProfile)
+		// 用户认证路由
+		api.POST("/register", userHandler.Register)
+		api.POST("/login", userHandler.Login)
 
-		// 博客文章相关
-		auth.POST("/posts", postHandler.Create)
-		auth.GET("/posts", postHandler.GetAll)
-		auth.GET("/posts/:id", postHandler.GetOne)
-		auth.PUT("/posts/:id", postHandler.Update)
-		auth.DELETE("/posts/:id", postHandler.Delete)
+		// 需要认证的路由
+		auth := api.Group("")
+		auth.Use(middleware.AuthMiddleware())
+		{
+			// 用户相关
+			auth.GET("/profile", userHandler.GetProfile)
+
+			// 博客文章相关
+			auth.POST("/posts", postHandler.Create)
+			auth.GET("/posts", postHandler.GetAll)
+			auth.GET("/posts/:id", postHandler.GetOne)
+			auth.PUT("/posts/:id", postHandler.Update)
+			auth.DELETE("/posts/:id", postHandler.Delete)
+		}
 	}
 
 	// 启动服务器

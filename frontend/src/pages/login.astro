@@ -1,0 +1,113 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { API_ROUTES } from "../config/api";
+---
+
+<Layout title="Login">
+  <div class="container py-8">
+    <div class="mx-auto max-w-md">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold">Welcome Back</h1>
+        <p class="text-muted-foreground mt-2">Sign in to your account</p>
+      </div>
+      <form class="space-y-4">
+        <div class="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder="Enter your email"
+          />
+        </div>
+        <div class="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            required
+            placeholder="Enter your password"
+          />
+        </div>
+        <div id="error-message" class="text-red-500 text-sm hidden"></div>
+        <Button type="submit" className="w-full" id="submit-button">
+          Sign In
+        </Button>
+      </form>
+      <div class="mt-6 text-center text-sm">
+        <span class="text-muted-foreground">Don't have an account?</span>
+        {" "}
+        <a href="/register" class="text-primary hover:underline">Sign up</a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script define:vars={{ apiRoutes: API_ROUTES }}>
+  const form = document.querySelector("form");
+  const submitButton = document.getElementById("submit-button");
+  const errorMessage = document.getElementById("error-message");
+
+  function showError(message) {
+    if (errorMessage) {
+      errorMessage.textContent = message;
+      errorMessage.classList.remove("hidden");
+    }
+  }
+
+  function hideError() {
+    if (errorMessage) {
+      errorMessage.classList.add("hidden");
+    }
+  }
+
+  function setLoading(isLoading) {
+    if (submitButton) {
+      submitButton.disabled = isLoading;
+      submitButton.textContent = isLoading ? "Signing in..." : "Sign In";
+    }
+  }
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    hideError();
+    setLoading(true);
+
+    const formData = new FormData(form);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const response = await fetch(apiRoutes.LOGIN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      localStorage.setItem("token", data.token);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error logging in:", error);
+      showError(
+        error instanceof Error
+          ? error.message
+          : "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  });
+</script>
