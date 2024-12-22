@@ -1,24 +1,17 @@
 import { API_ROUTES } from "../config/api";
 
-interface LoginCredentials {
+interface LoginData {
   email: string;
   password: string;
 }
 
-interface LoginResponse {
-  token: string;
-  message?: string;
-}
-
-export async function login(
-  credentials: LoginCredentials
-): Promise<LoginResponse> {
+export async function login(data: LoginData) {
   const response = await fetch(API_ROUTES.LOGIN, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(credentials),
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {

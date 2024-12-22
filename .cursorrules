@@ -11,38 +11,47 @@ The goal is to help you maintain a big picture as well as the progress of the ta
 
 # Tools
 
-Note all the tools are in python. So in the case you need to do batch processing, you can always consult the python files and write your own script.
+Note all the tools are written in Go. The tools can be built and run from the `tools` directory.
 
-## LLM
+## Web Browser
 
-You always have an LLM at your side to help you with the task. For simple tasks, you could invoke the LLM by running the following command:
+You can use the web scraper tool to fetch content from multiple URLs concurrently:
 ```
-py310/bin/python ./tools/llm_api.py --prompt "What is the capital of France?"
+go run cmd/web_scraper/main.go [-max-concurrent N] URL1 URL2 URL3
 ```
 
-But usually it's a better idea to check the content of the file and use the APIs in the `tools/llm_api.py` file to invoke the LLM if needed.
+Options:
+- `-max-concurrent N`: Maximum number of concurrent requests (default: 3, minimum: 1)
 
-## Web browser
+The tool will output the content of each web page, with error messages if any URLs fail to load. Long content will be truncated for better readability.
 
-You could use the `tools/web_scraper.py` file to scrape the web.
+Example:
 ```
-py310/bin/python ./tools/web_scraper.py --max-concurrent 3 URL1 URL2 URL3
+go run cmd/web_scraper/main.go -max-concurrent 3 https://golang.org https://github.com
 ```
-This will output the content of the web pages.
 
-## Search engine
+## Search Engine
 
-You could use the `tools/search_engine.py` file to search the web.
+You can use the search engine tool to perform web searches using Bing Web Search API:
 ```
-py310/bin/python ./tools/search_engine.py "your search keywords"
+go run cmd/search_engine/main.go [search keywords...]
 ```
-This will output the search results in the following format:
+
+Environment variables:
+- `BING_API_KEY`: Required. Your Bing Web Search API key
+
+The tool will output search results in the following format:
 ```
+Result 1:
 URL: https://example.com
 Title: This is the title of the search result
 Snippet: This is a snippet of the search result
 ```
-If needed, you can further use the `web_scraper.py` file to scrape the web page content.
+
+Example:
+```
+BING_API_KEY=your_api_key go run cmd/search_engine/main.go golang tutorial
+```
 
 # Lessons
 
@@ -61,3 +70,18 @@ If needed, you can further use the `web_scraper.py` file to scrape the web page 
 - When using seaborn styles in matplotlib, use 'seaborn-v0_8' instead of 'seaborn' as the style name due to recent seaborn version changes
 
 # Scratchpad
+
+Current Task: Convert Python tools to Go and update documentation
+[X] Plan the task
+[X] Create Go tools
+  [X] Create web scraper tool
+  [X] Create search engine tool
+[X] Update documentation
+  [X] Remove Python-specific content
+  [X] Add Go tool documentation
+  [X] Update examples
+[X] Improve tools
+  [X] Add better error handling
+  [X] Add usage instructions
+  [X] Add environment variable checks
+  [X] Improve output formatting
