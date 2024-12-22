@@ -40,12 +40,48 @@ go run cmd/search_engine/main.go [search keywords...]
 Environment variables:
 - `BING_API_KEY`: Required. Your Bing Web Search API key
 
-The tool will output search results in the following format:
+The tool provides detailed logging information to stderr, showing the progress of:
+- Command line argument processing
+- Environment variable validation
+- API request preparation
+- Request execution
+- Response parsing
+- Result processing
+
+Example output with logging:
 ```
+=== Search Engine Tool Started ===
+Command line arguments processed
+Search query: "golang tutorial"
+Input validation successful
+Executing search...
+=== Search Process Started ===
+Input query: "golang tutorial"
+API key validation: successful
+Preparing API request...
+Request URL: https://api.bing.microsoft.com/v7.0/search?q=golang+tutorial&count=10&responseFilter=Webpages&textFormat=Raw
+HTTP request created successfully
+Added authentication header
+Executing API request...
+Response status: 200 OK
+Reading response body...
+Response body length: 1234 bytes
+Parsing JSON response...
+Processing search results...
+Processing result 1/10...
+Processing result 2/10...
+...
+Results statistics:
+- Total results: 10
+- Family friendly results: 8
+=== Search Process Completed ===
+
 Result 1:
 URL: https://example.com
-Title: This is the title of the search result
-Snippet: This is a snippet of the search result
+Title: Example Title
+Snippet: Example snippet text...
+
+=== Search Engine Tool Completed ===
 ```
 
 Example:
@@ -71,17 +107,24 @@ BING_API_KEY=your_api_key go run cmd/search_engine/main.go golang tutorial
 
 # Scratchpad
 
-Current Task: Convert Python tools to Go and update documentation
+Current Task: Add detailed logging to the search engine tool
 [X] Plan the task
-[X] Create Go tools
-  [X] Create web scraper tool
-  [X] Create search engine tool
-[X] Update documentation
-  [X] Remove Python-specific content
-  [X] Add Go tool documentation
-  [X] Update examples
-[X] Improve tools
-  [X] Add better error handling
-  [X] Add usage instructions
-  [X] Add environment variable checks
-  [X] Improve output formatting
+[X] Create necessary directory structure and files
+  [X] Create tools directory
+  [X] Create cmd/search_engine directory
+  [X] Create search_engine.go implementation
+  [X] Create main.go for the command
+[X] Add logging for different stages:
+  [X] Program initialization and environment check
+  [X] Search query construction
+  [X] API request preparation
+  [X] API call execution
+  [X] Response parsing
+  [X] Results formatting and output
+[X] Set up Go module
+  [X] Create go.mod
+  [X] Run go mod tidy
+[X] Test the enhanced logging
+[X] Update documentation with logging examples
+
+Task completed successfully! The search engine tool now provides detailed logging information at every stage of its operation, making it easier to track the progress and debug any issues.
